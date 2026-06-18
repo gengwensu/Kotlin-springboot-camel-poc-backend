@@ -24,7 +24,7 @@ The service is intended to sit between client-facing applications and multiple b
 Client / Frontend / API Consumer
         |
         v
-sub-mgmt-aggregator
+submgmt-aggregator
         |
         +-- Subscription systems
         +-- Payment provider
@@ -74,10 +74,17 @@ client / adapter
 external systems
 ```
 
-Suggested package structure:
+Current package structure:
 
 ```text
-com.hnp.subscription.aggregator
+com.hnp.submgmt
+├── SubMgmtApplication.kt
+```
+
+Suggested future package structure:
+
+```text
+com.hnp.submgmt
 ├── config
 ├── controller
 ├── service
@@ -153,7 +160,15 @@ V3__add_subscription_indexes.sql
 
 Hibernate should validate schema in stable environments rather than generate it automatically.
 
-Recommended setting:
+Current setting:
+
+```yaml
+spring:
+  application:
+    name: poc
+```
+
+Recommended future JPA setting:
 
 ```yaml
 spring:
@@ -166,14 +181,19 @@ spring:
 
 Prefer YAML for new configuration.
 
-Recommended files:
+Current configuration:
 
 ```text
-application.yml
-application-local.yml
-application-dev.yml
-application-test.yml
-application-prod.yml
+src/main/resources/application.yaml
+```
+
+Recommended additional profile files:
+
+```text
+application-local.yaml
+application-dev.yaml
+application-test.yaml
+application-prod.yaml
 ```
 
 Secrets should not be committed to source control.
@@ -182,7 +202,18 @@ Local secrets can be supplied through environment variables or ignored local ove
 
 ## Testing Strategy
 
-Recommended test layers:
+Current test setup:
+
+```text
+src/test/kotlin/com/hnp/submgmt/
+├── SubMgmtApplicationTests.kt      (basic context load test)
+├── TestSubMgmtApplication.kt       (test application runner)
+└── TestcontainersConfiguration.kt  (MySQL container setup)
+```
+
+The basic `contextLoads()` test uses Testcontainers to spin up MySQL automatically.
+
+Recommended future test layers:
 
 ```text
 Unit tests
@@ -192,13 +223,11 @@ Spring slice tests
     Controller and repository tests with focused Spring context loading
 
 Integration tests
-    Testcontainers-backed tests using MySQL 8.4
+    Testcontainers-backed tests using MySQL
 
 End-to-end workflow tests
-    Future tests for complete subscription orchestration flows
+    Complete subscription orchestration flows
 ```
-
-The basic `contextLoads()` test should stay lightweight and should not depend on a running database unless explicitly configured.
 
 ## Local Development
 
@@ -207,19 +236,29 @@ Expected local flow:
 ```text
 Rancher Desktop / Docker-compatible runtime
         |
-docker compose
+docker compose up -d
         |
-MySQL 8.4
+MySQL (latest)
         |
-Spring Boot app
+Spring Boot app (./gradlew bootRun)
 ```
+
+Spring Boot Docker Compose support automatically detects and configures the MySQL container.
 
 Typical commands:
 
 ```bash
-./gradlew clean build
-./gradlew bootRun
+# Start database
 docker compose up -d
+
+# Build project
+./gradlew clean build
+
+# Run application (auto-connects to Docker Compose MySQL)
+./gradlew bootRun
+
+# Run tests (uses Testcontainers)
+./gradlew test
 ```
 
 ## CI/CD Direction
@@ -246,7 +285,7 @@ Potential AWS deployment targets:
 
 * ECS Fargate for simpler container deployment
 * EKS if Kubernetes orchestration becomes necessary
-* RDS MySQL 8.4 or Aurora MySQL-compatible 8.4 for database
+* RDS MySQL or Aurora MySQL-compatible for database
 
 Initial preference should be the simplest deployment model that satisfies operational requirements.
 
@@ -276,18 +315,18 @@ Security should be introduced deliberately after the basic application, database
 
 ## Key Architecture Decisions
 
-| Decision            | Current Direction                             |
+| Decision            | Current Implementation                        |
 | ------------------- | --------------------------------------------- |
-| Language            | Kotlin primary, Java allowed during migration |
+| Language            | Kotlin 1.9.25                                 |
 | Runtime             | Java 21                                       |
-| Framework           | Spring Boot 3.5.x                             |
-| Database            | MySQL 8.4 LTS                                 |
-| Migration Tool      | Flyway                                        |
-| Build Tool          | Gradle Kotlin DSL                             |
-| Integration Layer   | Apache Camel where useful                     |
-| Local Containers    | Rancher Desktop / Docker-compatible runtime   |
-| CI/CD               | GitHub Actions                                |
-| Integration Testing | Testcontainers                                |
+| Framework           | Spring Boot 3.5.15                            |
+| Database            | MySQL (latest via Docker Compose)             |
+| Migration Tool      | Flyway (configured, migrations pending)       |
+| Build Tool          | Gradle 8.x with Kotlin DSL                    |
+| Integration Layer   | Apache Camel (planned)                        |
+| Local Containers    | Docker Compose with Spring Boot integration   |
+| CI/CD               | GitHub Actions (planned)                      |
+| Integration Testing | Testcontainers (configured)                   |
 
 ## Open Questions
 

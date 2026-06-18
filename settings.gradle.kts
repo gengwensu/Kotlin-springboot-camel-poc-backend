@@ -1,1 +1,1 @@
-rootProject.name = "sub-mgmt-aggregator"
+rootProject.name = "submgmt-aggregator"

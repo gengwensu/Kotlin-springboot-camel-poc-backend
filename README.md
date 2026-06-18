@@ -1,43 +1,56 @@
-# Kotlin Spring Boot Camel POC Backend
+# Subscription Management Aggregator
 
-Proof of concept project for evaluating a modern Spring Boot and Kotlin stack as a replacement or evolution path for existing Java-based microservices.
+Proof of concept for a Spring Boot + Kotlin backend service that acts as an aggregation and orchestration layer for subscription-management workflows.
 
 ## Goals
 
 * Evaluate Kotlin adoption within a Spring Boot ecosystem
 * Establish a modern development workflow using Gradle Kotlin DSL
-* Explore Apache Camel integration and orchestration patterns
-* Validate MySQL 8.4 compatibility
-* Enable local development with containers
+* Build an aggregation layer for subscription management workflows
+* Validate MySQL 8.4 LTS compatibility with Docker Compose
+* Enable local development with Rancher Desktop or Docker Desktop
+* Support Testcontainers for integration testing
+* Prepare for future Apache Camel integration and orchestration patterns
 * Prepare for future deployment to AWS (ECS/EKS)
 * Establish CI/CD practices using GitHub Actions
 
 ## Technology Stack
 
-| Component                | Version |
-| ------------------------ | ------- |
-| Java                     | 21      |
-| Kotlin                   | 1.9.x   |
-| Spring Boot              | 3.5.x   |
-| Gradle                   | 8.x     |
-| MySQL                    | 8.4 LTS |
-| Flyway                   | Latest  |
-| Testcontainers           | Latest  |
-| Docker / Rancher Desktop | Current |
-| GitHub Actions           | Current |
+| Component                | Version  |
+| ------------------------ | -------- |
+| Java                     | 21       |
+| Kotlin                   | 1.9.25   |
+| Spring Boot              | 3.5.15   |
+| Gradle                   | 8.x      |
+| MySQL                    | latest   |
+| Flyway                   | (Spring) |
+| Testcontainers           | (Spring) |
+| Docker / Rancher Desktop | Current  |
+| GitHub Actions           | Current  |
 
 ## Project Structure
 
 ```text
-src/
-├── main/
-│   ├── kotlin/
-│   │   └── com/hnp/poc
-│   └── resources/
-│       ├── application.yml
-│       └── db/migration
-└── test/
-    └── kotlin/
+submgmt-aggregator/
+├── build.gradle.kts
+├── settings.gradle.kts
+├── compose.yaml
+├── docs/
+│   └── architecture.md
+└── src/
+    ├── main/
+    │   ├── kotlin/
+    │   │   └── com/hnp/submgmt/
+    │   │       └── SubMgmtApplication.kt
+    │   └── resources/
+    │       ├── application.yaml
+    │       └── db/migration/
+    └── test/
+        └── kotlin/
+            └── com/hnp/submgmt/
+                ├── PocApplicationTests.kt
+                ├── TestPocApplication.kt
+                └── TestcontainersConfiguration.kt
 ```
 
 ## Prerequisites
@@ -74,19 +87,31 @@ http://localhost:8080
 
 ## Database
 
-Planned local database:
+Local database is provided via Docker Compose:
+
+```bash
+docker compose up -d
+```
+
+This starts a MySQL container configured in `compose.yaml`:
 
 ```text
-MySQL 8.4 LTS
+MySQL: latest
+Database: mydatabase
+User: myuser
+Password: secret
+Port: 3306
 ```
 
 Database migrations are managed through Flyway.
 
-Migration scripts:
+Migration scripts location:
 
 ```text
-src/main/resources/db/migration
+src/main/resources/db/migration/
 ```
+
+Spring Boot Docker Compose support automatically detects and configures connection to the containerized MySQL instance.
 
 ## Testing
 
@@ -96,13 +121,13 @@ Run all tests:
 ./gradlew test
 ```
 
-Run integration tests:
+The project includes:
 
-```bash
-./gradlew integrationTest
-```
+* Basic context load test (`PocApplicationTests.kt`)
+* Testcontainers configuration for MySQL-backed integration tests
+* Test-specific Spring Boot application configuration
 
-(Planned)
+Integration tests use Testcontainers to spin up MySQL containers automatically.
 
 ## Development Workflow
 
@@ -124,22 +149,30 @@ Deployment
 
 ## Future Enhancements
 
-* Apache Camel routes
+* Apache Camel routes for workflow orchestration
+* REST API controllers for subscription operations
+* JPA entities and repositories for persistence
+* Flyway database migrations
 * OAuth2 / OIDC authentication
-* AWS deployment pipeline
+* AWS deployment pipeline (ECS or EKS)
 * OpenTelemetry observability
-* Kubernetes support
-* Testcontainers-based integration testing
 * GitHub Actions CI/CD
+* Integration tests using Testcontainers
 * Contract testing
+
+See `docs/architecture.md` for detailed architectural direction.
+
+## Documentation
+
+* [Architecture](docs/architecture.md) - Detailed architectural decisions and design direction
 
 ## References
 
-* Spring Boot
-* Kotlin
-* Apache Camel
-* Flyway
-* Testcontainers
-* GitHub Actions
-* AWS ECS / EKS
+* [Spring Boot](https://spring.io/projects/spring-boot)
+* [Kotlin](https://kotlinlang.org/)
+* [Apache Camel](https://camel.apache.org/)
+* [Flyway](https://flywaydb.org/)
+* [Testcontainers](https://testcontainers.com/)
+* [GitHub Actions](https://github.com/features/actions)
+* [AWS ECS](https://aws.amazon.com/ecs/) / [EKS](https://aws.amazon.com/eks/)
 

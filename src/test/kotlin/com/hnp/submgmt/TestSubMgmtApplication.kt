@@ -1,7 +1,5 @@
-package com.hnp.poc
+package com.hnp.submgmt
 
-import com.hnp.submgmt.SubMgmtApplication
-import com.hnp.submgmt.TestcontainersConfiguration
 import org.springframework.boot.fromApplication
 import org.springframework.boot.with
 
