@@ -4,8 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class PocApplication
+class SubMgmtApplication
 
 fun main(args: Array<String>) {
-	runApplication<PocApplication>(*args)
+	runApplication<SubMgmtApplication>(*args)
 }
