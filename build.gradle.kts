@@ -29,6 +29,13 @@ dependencyManagement {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	// Prometheus metrics endpoint: /actuator/prometheus
+	runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+
+	// OpenTelemetry tracing via Micrometer
+	implementation("io.micrometer:micrometer-tracing-bridge-otel")
+	implementation("io.micrometer:micrometer-tracing-bridge-otel")
+	implementation("io.opentelemetry:opentelemetry-exporter-otlp")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web") {
